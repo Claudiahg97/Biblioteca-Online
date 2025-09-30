@@ -17,6 +17,7 @@
         Fecha de publicación(aaaa-mm-dd): <input type="date" name="fecha"> 
         Link de compra: <input type="url" name="link">
         Sinopsis: <input type = "text" name="descripcion">
+        <input type="sumit" name="subir" value = "Registrar libro">
     </form>
 </body>
 </html>
