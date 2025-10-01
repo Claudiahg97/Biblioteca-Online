@@ -25,7 +25,7 @@
     if($_SESSION['comprobarUser']){
         if ($comprobarEmail && $comprobarPass) {
             try {
-                $conn = require( "conection.php");
+                $conn = require( "../db/conection.php");
 
                 // prepare sql and bind parameters
                 $stmt = $conn->prepare("INSERT INTO usuarios (nombre, email, passw)

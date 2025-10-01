@@ -2,7 +2,7 @@
     session_start();
 
     try {
-        $conn = require( "conection.php");
+        $conn = require( "../db/conection.php");
 
         $stmt = $conn->prepare("SELECT * FROM usuarios WHERE email = :email");
         $stmt->bindParam(':email', $_SESSION['email']);

@@ -3,7 +3,7 @@
 
     $email = $_POST['email'];
     try {
-        $conn = require( "conection.php");
+        $conn = require( "../db/conection.php");
 
         $stmt = $conn->prepare("SELECT * FROM usuarios WHERE email = :email");
         $stmt->bindParam(':email', $email);
