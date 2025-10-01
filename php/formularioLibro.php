@@ -18,7 +18,7 @@ $generos = $stmt->fetch(PDO::FETCH_ASSOC);
     <link rel = "stylesheet" href = "style/styles.css">
 </head>
 <body>
-    <form action="subirLibro.php" method="POST">
+    <form action="subirLibro.php" method="POST" enctype="multipart/form-data">
         <h3>Subir un nuevo libro</h3>
         
         <label for="isbn">ISBN:</label>
@@ -47,6 +47,8 @@ $generos = $stmt->fetch(PDO::FETCH_ASSOC);
         <label for="fecha">Fecha de publicación:</label>
         <input type="date" id="fecha" name="fecha">
         <br>
+        <label for ="portada">Portada</label> 
+         <input type="file" name="fileToUpload" id="fileToUpload">
         <label for="link">Link de compra:</label>
         <input type="url" id="link" name="link" placeholder="https://ejemplo.com">
         <br>
