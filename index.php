@@ -18,7 +18,7 @@
     
     <form action="php/inicio.php" method = "POST">
     <h3>Inicio de Sesión</h3>
-    Email: <input type="text" name="email" value = "<?php  if(isset($_SESSION['emailI'])) echo $_SESSION['email']?>"><br>       
+    Email: <input type="text" name="emailI" value = "<?php  if(isset($_SESSION['emailI'])) echo $_SESSION['email']?>"><br>       
     Contraseña: <input type="password" name="contra" required > <br>
     <input type="submit" name= "abrir" value="Iniciar Sesión" >
     </form>

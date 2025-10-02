@@ -9,7 +9,7 @@
     if ($_POST['password'] === $_POST['compPassword'] && $_POST['password'] != "") $comprobarPass = true;
     else{
         $_SESSION['error'] = "La contraseña no es valida";
-        header('Location:http://localhost/Practicas/Biblioteca-Online');
+        header('Location:http://localhost/Biblioteca-Online');
     } 
 
     if (filter_var($_POST['email'],FILTER_VALIDATE_EMAIL)){
@@ -17,10 +17,10 @@
         $_SESSION['email'] = $_POST['email'];
     }else{
         $_SESSION['error'] = "Formato de email incorrecto";
-        header('Location:http://localhost/Practicas/Biblioteca-Online');
+        header('Location:http://localhost/Biblioteca-Online');
     }
 
-    header('Location:http://localhost/Practicas/Biblioteca-Online/php/compRegistro.php');
+    header('Location:http://localhost/Biblioteca-Online/php/compRegistro.php');
 
     if($_SESSION['comprobarUser']){
         if ($comprobarEmail && $comprobarPass) {
@@ -47,10 +47,10 @@
             $conn = null;
             $_SESSION['nombre'] ="";
             $_SESSION['email'] ="";
-            header('Location:http://localhost/Practicas/Biblioteca-Online');
+            header('Location:http://localhost/Biblioteca-Online');
         }
     } else {
         $_SESSION['email'] = "";
         $_SESSION['error'] = "Ya existe un usuario con ese email";
-        header('Location:http://localhost/Practicas/Biblioteca-Online');
+        header('Location:http://localhost/Biblioteca-Online');
     }

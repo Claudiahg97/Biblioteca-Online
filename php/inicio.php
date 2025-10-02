@@ -1,10 +1,10 @@
 <?php
     session_start();
 
-    $email = $_POST['email'];
+    $email = $_POST['emailI'];
     try {
         $conn = require( "../db/conection.php");
-
+        
         $stmt = $conn->prepare("SELECT * FROM usuarios WHERE email = :email");
         $stmt->bindParam(':email', $email);
         $stmt->execute();
@@ -12,19 +12,23 @@
         /*Guardo la información sacada de la base de datos en la variable $usuario
         * con la función fetch(PDO::FETCH_ASSOC) el contenido es un array asosiativo
         */
+        var_dump($usuario);  
     } catch(PDOException $e) {
         echo "Error: " . $e->getMessage();
     }
-    if ($usuario) {             
+    if ($usuario) { 
+                 
         if (password_verify($_POST['contra'], $usuario['passw'])) {
             $_SESSION['error'] = "Inicio de sesión exitoso";
             $_SESSION['nombre'] = $usuario['nombre'];
+            $_SESSION['id_usuario'] = $usuario['id'];
             $_SESSION['login'] = true;
-            header('Location:http://localhost/Practicas/Biblioteca-Online/php/biblioteca.php');
+            
+            header('Location:http://localhost/Biblioteca-Online/php/biblioteca.php');
         }else{
             $_SESSION['error'] = "Inicio de sesión incorrecto";
             $_SESSION['emailI'] = $usuario['email'];
-            header('Location:http://localhost/Practicas/Biblioteca-Online');
+            header('Location:http://localhost/Biblioteca-Online');
         }
     }
     $conn = null;

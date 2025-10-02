@@ -25,7 +25,7 @@ CREATE TABLE libros (
     link VARCHAR(500),
     descripcion TEXT,
     id_usuario INT NOT NULL,
-    img VARCHAR(255)
+    img VARCHAR(255),
     PRIMARY KEY(id),
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE CASCADE
 );
