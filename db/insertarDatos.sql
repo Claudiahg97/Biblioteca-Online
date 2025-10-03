@@ -1,6 +1,5 @@
 -- Insertar géneros literarios en la tabla generos
 INSERT INTO generos (nombre) VALUES
--- Ficción
 ('Ficción'),
 ('Novela'),
 ('Ciencia Ficción'),
@@ -17,8 +16,6 @@ INSERT INTO generos (nombre) VALUES
 ('Realismo Mágico'),
 ('Gótica'),
 ('Western'),
-
--- No Ficción
 ('No Ficción'),
 ('Biografía'),
 ('Autobiografía'),
@@ -39,8 +36,6 @@ INSERT INTO generos (nombre) VALUES
 ('Música'),
 ('Deportes'),
 ('Salud'),
-
--- Otros géneros
 ('Poesía'),
 ('Teatro'),
 ('Cómic'),

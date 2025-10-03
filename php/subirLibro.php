@@ -2,75 +2,103 @@
 session_start();
 
 // Verificar que el usuario esté logueado
-if (!isset($_SESSION['nombre'])) {
-    header("Location: inicio.php");
-    exit();
+if (!isset($_SESSION['id_usuario'])) {
+    header("Location: http://localhost/Biblioteca-Online");
+    exit;
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Conexión a la base de datos
-    $conn = require( "../db/conection.php");
+    $conn = require("conection.php");
 
     $target_dir = "../uploads/";
+    $target_file = "";
 
-// Si no subió nada, usamos una imagen por defecto
+    // Manejo de la imagen
     if (empty($_FILES["fileToUpload"]["name"])) {
-        $target_file = $target_dir . "default.jpg"; // tu imagen por defecto en uploads/
-        $uploadOk = 1;
-        $imageFileType = "jpg";
+        $target_file = "uploads/default.jpg"; // Ruta relativa para guardar en BD
     } else {
-        // Si subió algo, seguimos con el flujo normal
-        $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
-        $uploadOk = 1;
-        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+        $imageFileType = strtolower(pathinfo($_FILES["fileToUpload"]["name"], PATHINFO_EXTENSION));
+        $newFileName = uniqid() . '.' . $imageFileType; // Nombre único
+        $target_file = $target_dir . $newFileName;
+        $target_file_db = "uploads/" . $newFileName; // Ruta para BD
 
-        // Verificación de si realmente es una imagen
-        if(isset($_POST["submit"])) {
-            $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
-            if($check !== false) {
-                echo "File is an image - " . $check["mime"] . ".";
-                $uploadOk = 1;
-            } else {
-                echo "File is not an image.";
-                $uploadOk = 0;
-            }
+        /**
+         * $nombreOriginal = pathinfo($_FILES["fileToUpload"]["name"], PATHINFO_FILENAME);
+$extension = strtolower(pathinfo($_FILES["fileToUpload"]["name"], PATHINFO_EXTENSION));
+
+// Hash único: sha256(nombreArchivo_nombreUsuario)
+$hashNombre = hash('sha256', $nombreOriginal . '_' . $_SESSION['nombre']);
+$nombreFinal = $hashNombre . '.' . $extension;
+         */
+
+        // Verificar que es una imagen
+        $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
+        if($check === false) {
+            echo "<script>alert('El archivo no es una imagen válida'); window.history.back();</script>";
+            exit;
+        }
+
+        // Verificar tamaño (5MB máximo)
+        if ($_FILES["fileToUpload"]["size"] > 5000000) {
+            echo "<script>alert('El archivo es demasiado grande'); window.history.back();</script>";
+            exit;
+        }
+
+        // Permitir ciertos formatos
+        if(!in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif'])) {
+            echo "<script>alert('Solo se permiten archivos JPG, JPEG, PNG y GIF'); window.history.back();</script>";
+            exit;
+        }
+
+        // Intentar subir el archivo
+        if (!move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
+            echo "<script>alert('Error al subir la imagen'); window.history.back();</script>";
+            exit;
         }
     }
     
     // Obtener datos del formulario
-    $isbn = $_POST['isbn'];
+    $isbn = $_POST['isbn'] ?? '';
     $titulo = $_POST['titulo'];
     $autor = $_POST['autor'];
-    $fecha = $_POST['fecha'];
-    $link = $_POST['link'];
-    $descripcion = $_POST['descripcion'];
+    $fecha = $_POST['fecha'] ?? null;
+    $link = $_POST['link'] ?? '';
+    $descripcion = $_POST['descripcion'] ?? '';
     $generos = $_POST['generos']; // Array de IDs de géneros
     $id_usuario = $_SESSION['id_usuario'];
-    $img = password_hash($target_file, PASSWORD_ARGON2ID);
+    $img = $target_file_db ?? 'uploads/default.jpg'; //Elijo la ruta de la imagen subida o la imagen por defecto.
     
-    // Preparar consulta para insertar libro
-    $stmt = $conn->prepare("INSERT INTO libros (isbn, titulo, autor, fecha, link, descripcion, id_usuario, img) VALUES (?, ?, ?, ?, ?, ?, ?,?)");
-    $stmt->bind_param("ssssssi", $isbn, $titulo, $autor, $fecha, $link, $descripcion, $id_usuario, $img);
-    
-    if ($stmt->execute()) {
-        $id_libro = $stmt->insert_id; // Obtener ID del libro insertado
+    try {
+        // Preparar consulta para insertar libro (con PDO)
+        $stmt = $conn->prepare("INSERT INTO libros (isbn, titulo, autor, fecha, link, descripcion, id_usuario, img) 
+                               VALUES (:isbn, :titulo, :autor, :fecha, :link, :descripcion, :id_usuario, :img)");
         
-        // Insertar los géneros en la tabla libro_genero
-        $stmt_genero = $conn->prepare("INSERT INTO libro_genero (id_libro, id_genero) VALUES (?, ?)");
+        $stmt->bindParam(':isbn', $isbn);
+        $stmt->bindParam(':titulo', $titulo);
+        $stmt->bindParam(':autor', $autor);
+        $stmt->bindParam(':fecha', $fecha);
+        $stmt->bindParam(':link', $link);
+        $stmt->bindParam(':descripcion', $descripcion);
+        $stmt->bindParam(':id_usuario', $id_usuario);
+        $stmt->bindParam(':img', $img);
         
-        foreach ($generos as $id_genero) {
-            $stmt_genero->bind_param("ii", $id_libro, $id_genero);
-            $stmt_genero->execute();
+        if ($stmt->execute()) {
+            $id_libro = $conn->lastInsertId(); // Obtener ID del libro insertado
+            
+            // Insertar los géneros en la tabla libro_genero
+            $stmt_genero = $conn->prepare("INSERT INTO libro_genero (id_libro, id_genero) VALUES (:id_libro, :id_genero)");
+            
+            foreach ($generos as $id_genero) {
+                $stmt_genero->bindParam(':id_libro', $id_libro);
+                $stmt_genero->bindParam(':id_genero', $id_genero);
+                $stmt_genero->execute();
+            }
+            
+            echo "<script>alert('Libro registrado exitosamente'); window.location.href='biblioteca.php';</script>";
         }
-        
-        $stmt_genero->close();
-        
-        echo "<script>alert('Libro registrado exitosamente'); window.location.href='insertarLibro.php';</script>";
-    } else {
-        echo "<script>alert('Error al registrar el libro: " . $conn->error . "');</script>";
+    } catch(PDOException $e) {
+        echo "<script>alert('Error al registrar el libro: " . $e->getMessage() . "'); window.history.back();</script>";
     }
     
-    $stmt->close();
-    $conn->close();
+    $conn = null;
 }
-?>

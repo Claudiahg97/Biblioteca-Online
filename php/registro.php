@@ -1,56 +1,64 @@
 <?php
-    session_start();
+session_start();
 
-    $comprobarPass = false;
-    $comprobarEmail = false;
+$comprobarPass = false;
+$comprobarEmail = false;
 
-    $_SESSION['nombre'] = $_POST['name'];
+$_SESSION['nombre'] = $_POST['name'];
 
-    if ($_POST['password'] === $_POST['compPassword'] && $_POST['password'] != "") $comprobarPass = true;
-    else{
-        $_SESSION['error'] = "La contraseña no es valida";
-        header('Location:http://localhost/Biblioteca-Online');
-    } 
+// Validar contraseña
+if ($_POST['password'] === $_POST['compPassword'] && $_POST['password'] != "") {
+    $comprobarPass = true;
+} else {
+    $_SESSION['error'] = "La contraseña no es válida";
+    header('Location: http://localhost/Biblioteca-Online');
+    exit;
+} 
 
-    if (filter_var($_POST['email'],FILTER_VALIDATE_EMAIL)){
-        $comprobarEmail = true;
-        $_SESSION['email'] = $_POST['email'];
-    }else{
-        $_SESSION['error'] = "Formato de email incorrecto";
-        header('Location:http://localhost/Biblioteca-Online');
-    }
+// Validar email
+if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+    $comprobarEmail = true;
+    $_SESSION['email'] = $_POST['email'];
+} else {
+    $_SESSION['error'] = "Formato de email incorrecto";
+    header('Location: http://localhost/Biblioteca-Online');
+    exit;
+}
 
-    header('Location:http://localhost/Biblioteca-Online/php/compRegistro.php');
+// Si las validaciones pasaron, verificar si el usuario existe
+try {
+    $conn = require("conection.php");
 
-    if($_SESSION['comprobarUser']){
-        if ($comprobarEmail && $comprobarPass) {
-            try {
-                $conn = require( "../db/conection.php");
+    $stmt = $conn->prepare("SELECT * FROM usuarios WHERE email = :email");
+    $stmt->bindParam(':email', $_SESSION['email']);
+    $stmt->execute();
+    $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                // prepare sql and bind parameters
-                $stmt = $conn->prepare("INSERT INTO usuarios (nombre, email, passw)
-                VALUES (:nombre, :email, :passw)");
-                $stmt->bindParam(':nombre', $nombre);
-                $stmt->bindParam(':email', $email);
-                $stmt->bindParam(':passw', $password);
+    if (empty($usuario)) {
+        // Usuario NO existe, podemos registrarlo
+        $stmt = $conn->prepare("INSERT INTO usuarios (nombre, email, passw) VALUES (:nombre, :email, :passw)");
+        $stmt->bindParam(':nombre', $nombre);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':passw', $password);
 
-                // insert a row
-                $nombre = $_POST['name'];
-                $email = $_POST['email'];
-                $password = password_hash($_POST['password'], PASSWORD_ARGON2ID);
-                $stmt->execute();
+        $nombre = $_POST['name'];
+        $email = $_POST['email'];
+        $password = password_hash($_POST['password'], PASSWORD_ARGON2ID);
+        $stmt->execute();
 
-                $_SESSION['error'] = "Se ha registado correctamente";
-            } catch(PDOException $e) {
-                echo "Error: " . $e->getMessage();
-            }
-            $conn = null;
-            $_SESSION['nombre'] ="";
-            $_SESSION['email'] ="";
-            header('Location:http://localhost/Biblioteca-Online');
-        }
+        $_SESSION['error'] = "Se ha registrado correctamente";
+        $_SESSION['nombre'] = "";
+        $_SESSION['email'] = "";
     } else {
+        // Usuario ya existe
         $_SESSION['email'] = "";
         $_SESSION['error'] = "Ya existe un usuario con ese email";
-        header('Location:http://localhost/Biblioteca-Online');
     }
+
+} catch(PDOException $e) {
+    $_SESSION['error'] = "Error: " . $e->getMessage();
+}
+
+$conn = null;
+header('Location: http://localhost/Biblioteca-Online');
+exit;

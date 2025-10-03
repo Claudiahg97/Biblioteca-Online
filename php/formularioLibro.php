@@ -1,12 +1,12 @@
 <?php 
 session_start(); 
 
-$conn = require( "../db/conection.php");
+$conn = require( "conection.php");
 
 // Obtener géneros de la base de datos
 $sql = "SELECT * FROM generos ORDER BY nombre";
 $stmt = $conn->query($sql);
-$generos = $stmt->fetch(PDO::FETCH_ASSOC); 
+$generos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -33,13 +33,13 @@ $generos = $stmt->fetch(PDO::FETCH_ASSOC);
         <label for="generos">Géneros:</label>
         <select id="generos" name="generos[]" multiple required>
             <?php
-            if ($generos -> num_rows > 0) {
-                foreach ($generos as $fila)
-                    echo '<option value="' . $fila['id'] . '">' . $fila['nombre'] . '</option>';
-                
-            } else {
-                echo '<option value="">No hay géneros disponibles</option>';
-            }
+                if (count($generos) > 0) {
+                    foreach ($generos as $fila) {
+                        echo '<option value="' . $fila['id'] . '">' . $fila['nombre'] . '</option>';
+                    }
+                } else {
+                    echo '<option value="">No hay géneros disponibles</option>';
+                }
             ?>
         </select>
         <p class="info">Mantén presionado Ctrl (Cmd en Mac) para seleccionar múltiples géneros</p>
@@ -48,7 +48,8 @@ $generos = $stmt->fetch(PDO::FETCH_ASSOC);
         <input type="date" id="fecha" name="fecha">
         <br>
         <label for ="portada">Portada</label> 
-         <input type="file" name="fileToUpload" id="fileToUpload">
+        <input type="file" name="fileToUpload" id="fileToUpload">
+        <br>
         <label for="link">Link de compra:</label>
         <input type="url" id="link" name="link" placeholder="https://ejemplo.com">
         <br>

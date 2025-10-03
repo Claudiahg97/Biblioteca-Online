@@ -3,7 +3,7 @@
 
     $email = $_POST['emailI'];
     try {
-        $conn = require( "../db/conection.php");
+        $conn = require( "conection.php");
         
         $stmt = $conn->prepare("SELECT * FROM usuarios WHERE email = :email");
         $stmt->bindParam(':email', $email);
@@ -12,7 +12,6 @@
         /*Guardo la información sacada de la base de datos en la variable $usuario
         * con la función fetch(PDO::FETCH_ASSOC) el contenido es un array asosiativo
         */
-        var_dump($usuario);  
     } catch(PDOException $e) {
         echo "Error: " . $e->getMessage();
     }
