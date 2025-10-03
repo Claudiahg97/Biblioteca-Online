@@ -1,6 +1,10 @@
 <?php 
 session_start(); 
-
+if (isset($_SESSION['errorLibro'])) {
+    echo "<div style='color: red; padding: 10px; border: 1px solid red; margin: 10px;'>" . 
+         htmlspecialchars($_SESSION['error']) . "</div>";
+    unset($_SESSION['error']);
+}
 $conn = require( "conection.php");
 
 // Obtener géneros de la base de datos
@@ -15,7 +19,7 @@ $generos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Biblioteca Online</title>
-    <link rel = "stylesheet" href = "style/styles.css">
+    <link rel = "stylesheet" href = "style/style.css">
 </head>
 <body>
     <form action="subirLibro.php" method="POST" enctype="multipart/form-data">

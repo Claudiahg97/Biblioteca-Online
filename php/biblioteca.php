@@ -1,5 +1,13 @@
 <?php
 session_start();
+
+// Mostrar mensajes de éxito o error
+if (isset($_SESSION['exito'])) {
+    echo "<div style='color: green; padding: 10px; border: 1px solid green; margin: 10px;'>" . 
+         htmlspecialchars($_SESSION['exito']) . "</div>";
+    unset($_SESSION['exito']);
+}
+
 $conn = require("conection.php");
 
 // Obtener todos los libros de la base de datos
@@ -32,8 +40,9 @@ $libros = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="libros-container">
             <?php foreach ($libros as $libro): ?>
                 <div class="libro-card">
-                    <?php if (!empty($libro['img'])): ?>
-                        <img src="<?php echo htmlspecialchars($libro['img']); ?>" alt="Portada">
+                    <?php if (!empty($libro['img'])): 
+                        $imagen = "../" . $libro['img'];?>
+                        <img src="<?php echo htmlspecialchars($imagen); ?>" alt="Portada" width="250" height="380">
                     <?php endif; ?>
                     
                     <h3><?php echo htmlspecialchars($libro['titulo']); ?></h3>
@@ -54,6 +63,12 @@ $libros = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php if (!empty($libro['link'])): ?>
                         <a href="<?php echo htmlspecialchars($libro['link']); ?>" target="_blank">Comprar</a>
                     <?php endif; ?>
+                    <?php
+                        if($libro['id_usuario'] === $_SESSION['id_usuario']): ?>
+                        <form action="editarLibro.php" method="GET">
+                            <button type="submit">Editar el libro</button>
+                        </form>
+                    <?php endif; ?>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -63,5 +78,8 @@ $libros = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <p>Sé el primero en añadir un libro a la biblioteca</p>
         </div>
     <?php endif; ?>
+    <form action="cierre.php" method = "POST">
+    <input type="submit" name= "cerrar" value="Cerrar Sesión" >
+    </form>
 </body>
 </html>
