@@ -12,7 +12,6 @@ if ($_POST['password'] === $_POST['compPassword'] && $_POST['password'] != "") {
 } else {
     $_SESSION['error'] = "La contraseña no es válida";
     header('Location: http://localhost/Biblioteca-Online');
-    exit;
 } 
 
 // Validar email
@@ -22,7 +21,6 @@ if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
 } else {
     $_SESSION['error'] = "Formato de email incorrecto";
     header('Location: http://localhost/Biblioteca-Online');
-    exit;
 }
 
 // Si las validaciones pasaron, verificar si el usuario existe
@@ -61,4 +59,3 @@ try {
 
 $conn = null;
 header('Location: http://localhost/Biblioteca-Online');
-exit;

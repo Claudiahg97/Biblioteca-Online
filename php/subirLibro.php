@@ -4,7 +4,6 @@ session_start();
 // Verificar que el usuario esté logueado
 if (!isset($_SESSION['id_usuario'])) {
     header("Location: http://localhost/Biblioteca-Online");
-    exit;
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -17,43 +16,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($_FILES["fileToUpload"]["name"])) {
         $target_file = "uploads/default.jpg"; // Ruta relativa para guardar en BD
     } else {
-        $imageFileType = strtolower(pathinfo($_FILES["fileToUpload"]["name"], PATHINFO_EXTENSION));
-        $newFileName = uniqid() . '.' . $imageFileType; // Nombre único
+        $nameOriginal = pathinfo($_FILES["fileToUpload"]["name"], PATHINFO_FILENAME);
+        $extension = strtolower(pathinfo($_FILES["fileToUpload"]["name"], PATHINFO_EXTENSION));
+        // Hash único: sha256(nombreArchivo_nombreUsuario)
+        $hashNombre = hash('sha256', $nombreOriginal . '_' . $_SESSION['nombre']);
+        $newFileName = $hashNombre . '.' . $extension; // Nombre único
         $target_file = $target_dir . $newFileName;
         $target_file_db = "uploads/" . $newFileName; // Ruta para BD
-
-        /**
-         * $nombreOriginal = pathinfo($_FILES["fileToUpload"]["name"], PATHINFO_FILENAME);
-$extension = strtolower(pathinfo($_FILES["fileToUpload"]["name"], PATHINFO_EXTENSION));
-
-// Hash único: sha256(nombreArchivo_nombreUsuario)
-$hashNombre = hash('sha256', $nombreOriginal . '_' . $_SESSION['nombre']);
-$nombreFinal = $hashNombre . '.' . $extension;
-         */
 
         // Verificar que es una imagen
         $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
         if($check === false) {
             echo "<script>alert('El archivo no es una imagen válida'); window.history.back();</script>";
-            exit;
         }
 
         // Verificar tamaño (5MB máximo)
         if ($_FILES["fileToUpload"]["size"] > 5000000) {
             echo "<script>alert('El archivo es demasiado grande'); window.history.back();</script>";
-            exit;
         }
 
         // Permitir ciertos formatos
         if(!in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif'])) {
             echo "<script>alert('Solo se permiten archivos JPG, JPEG, PNG y GIF'); window.history.back();</script>";
-            exit;
         }
 
         // Intentar subir el archivo
         if (!move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
             echo "<script>alert('Error al subir la imagen'); window.history.back();</script>";
-            exit;
         }
     }
     
