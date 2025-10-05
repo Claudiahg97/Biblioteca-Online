@@ -42,7 +42,7 @@ $libros = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="libro-card">
                     <?php if (!empty($libro['img'])): 
                         $imagen = "../" . $libro['img'];?>
-                        <img src="<?php echo htmlspecialchars($imagen); ?>" alt="Portada" width="250" height="380">
+                        <img src="<?php echo htmlspecialchars($imagen); ?>" alt="Portada" width="100" height="150">
                     <?php endif; ?>
                     
                     <h3><?php echo htmlspecialchars($libro['titulo']); ?></h3>
