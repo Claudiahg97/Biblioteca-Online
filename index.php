@@ -5,29 +5,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Biblioteca online</title>
+    <link rel="stylesheet" href="style/style.css">
 </head>
 <body>
-    <form action="php/registro.php" method = "POST">
-    <h3>Registro de nuevo usuario</h3>        
-    Nombre: <input type="text" name="name" value = "<?php if(isset($_SESSION['nombre'])) echo $_SESSION['nombre']?>"> <br>   
-    Email: <input type="text" name="email" placeholder= "ejmplo@mail.com" value = "<?php  if(isset($_SESSION['email'])) echo $_SESSION['email']?>"><br>       
-    Contraseña: <input type="password" name="password" required > <br>
-    Repite la contraseña: <input type="password" name="compPassword" required> <br>
-    <input type="submit" name= "abrir" value="Registrarse" >
-    </form>
-    
-    <form action="php/inicio.php" method = "POST">
-    <h3>Inicio de Sesión</h3>
-    Email: <input type="text" name="emailI" placeholder= "ejmplo@mail.com" value = "<?php  if(isset($_SESSION['emailI'])) echo $_SESSION['emailI']?>"><br>       
-    Contraseña: <input type="password" name="contra" required > <br>
-    <input type="submit" name= "abrir" value="Iniciar Sesión" >
-    </form>
-    <?php        
-        if (isset($_SESSION['error'])){
-            echo "<h3>" . $_SESSION['error'] . "<h3>";
-        }        
-    ?>
-    
+    <div class="container auth-container">
+        <h1>Biblioteca Online</h1>
+        <form action="php/registro.php" method = "POST">
+        <h3>Registro de nuevo usuario</h3>        
+        Nombre: <input type="text" name="name" placeholder= "ej: Santiago" value = "<?php if(isset($_SESSION['nombre'])) echo $_SESSION['nombre']?>"> <br>   
+        Email: <input type="text" name="email" placeholder= "ej: ejemplo@mail.com" value = "<?php  if(isset($_SESSION['email'])) echo $_SESSION['email']?>"><br>       
+        Contraseña*: <input type="password" name="password" required > <br>
+        Repite la contraseña*: <input type="password" name="compPassword" required> <br>
+        <input type="submit" name= "abrir" value="Registrarse" >
+        </form>
+        
+        <form action="php/inicio.php" method = "POST">
+        <h3>Inicio de Sesión</h3>
+        Email: <input type="text" name="emailI" placeholder= "ej: ejemplo@mail.com" value = "<?php  if(isset($_SESSION['emailI'])) echo $_SESSION['emailI']?>"><br>       
+        Contraseña*: <input type="password" name="contra" required > <br>
+        <input type="submit" name= "abrir" value="Iniciar Sesión" >
+        </form>
+        <?php        
+            if (isset($_SESSION['error'])){
+                echo "<h3>" . $_SESSION['error'] . "<h3>";
+            }        
+        ?>
+     </div>
 </body>
 </html>
 <?php session_destroy(); ?>

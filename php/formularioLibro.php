@@ -19,22 +19,25 @@ $generos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Biblioteca Online</title>
-    <link rel = "stylesheet" href = "style/style.css">
+    <link rel="stylesheet" href="../style/style.css">
 </head>
 <body>
+    
+    <div class="container">
+        <a href="biblioteca.php">← Volver a la Biblioteca</a>
     <form action="subirLibro.php" method="POST" enctype="multipart/form-data">
         <h3>Subir un nuevo libro</h3>
         
-        <label for="isbn">ISBN:</label>
-        <input type="text" id="isbn" name="isbn" placeholder="978-84-206-0689-8">
+        <label for="isbn">ISBN*:</label>
+        <input type="text" id="isbn" name="isbn" placeholder="978-8420606898" required>
         <br>
-        <label for="titulo">Título:</label>
+        <label for="titulo">Título*:</label>
         <input type="text" id="titulo" name="titulo" required>
         <br>
-        <label for="autor">Autor:</label>
+        <label for="autor">Autor*:</label>
         <input type="text" id="autor" name="autor" required>
         <br>
-        <label for="generos">Géneros:</label>
+        <label for="generos">Géneros*:</label>
         <select id="generos" name="generos[]" multiple required>
             <?php
                 if (count($generos) > 0) {
@@ -62,6 +65,7 @@ $generos = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <br>
         <input type="submit" name="subir" value="Registrar libro">
     </form>
+    </div>
 </body>
 </html>
 
